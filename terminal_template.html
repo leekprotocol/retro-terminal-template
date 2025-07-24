@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal Template</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: #00FF99;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #container {
+      width: 90%;
+      max-width: 800px;
+    }
+
+    #terminal {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      min-height: 400px;
+    }
+
+    .terminal-line {
+      margin-bottom: 8px;
+    }
+
+    #userInput {
+      background: black;
+      color: #00FF99;
+      border: none;
+      font-size: 1em;
+      width: 100%;
+      outline: none;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      caret-color: #00FF99;
+    }
+
+    #userInput::placeholder {
+      color: #00FF99;
+      opacity: 0.4;
+    }
+
+    #userInput:focus {
+      caret-color: #00FF99;
+    }
+
+    .footer-line {
+      position: absolute;
+      bottom: 8px;
+      width: 100%;
+      text-align: center;
+      color: #00FF99;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="terminal"></div>
+    <input id="userInput" type="text" autocomplete="off" placeholder="█">
+  </div>
+
+  <div class="footer-line">Template Terminal Ready.</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const terminal = document.getElementById("terminal");
+      const inputField = document.getElementById("userInput");
+      inputField.focus();
+
+      function printToTerminal(text) {
+        const line = document.createElement("div");
+        line.className = "terminal-line";
+        line.textContent = text;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+
+      function respond(input) {
+        const response = "You typed: " + input;
+        printToTerminal("> " + response);
+      }
+
+      inputField.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          const input = inputField.value;
+          if (input.trim() !== "") {
+            printToTerminal("> " + input);
+            respond(input);
+            inputField.value = "";
+          }
+        }
+      });
+
+      printToTerminal("█ Booting Terminal Template...");
+      printToTerminal("█ Ready for input.");
+      printToTerminal("type anything to begin");
+    });
+  </script>
+</body>
+</html>
