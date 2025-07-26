@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Soul Terminal — Template Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: #00FF99;
+      font-family: 'Courier New', Courier, monospace;
+      overflow-x: hidden;
+    }
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      width: 90%;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    #terminal {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      min-height: 400px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    .terminal-line {
+      margin-bottom: 8px;
+    }
+
+    #inputLine {
+      display: inline-block;
+      font-size: 1em;
+      margin-top: 10px;
+      cursor: text;
+    }
+
+    #fakeInput {
+      display: inline;
+    }
+
+    #realInput {
+      position: relative;
+      opacity: 0;
+      height: 1px;
+      width: 1px;
+      z-index: 0;
+    }
+
+    #cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1em;
+      background-color: #00FF99;
+      animation: blink 1s step-start infinite;
+      vertical-align: bottom;
+    }
+
+    @keyframes blink {
+      0%, 49% { background-color: #00FF99; }
+      50%, 100% { background-color: transparent; }
+    }
+
+    .footer-line {
+      text-align: center;
+      color: #00FF99;
+      font-size: 0.85em;
+      margin-top: 20px;
+    }
+
+    .glitch {
+      animation: flicker 0.3s linear 1;
+    }
+
+    @keyframes flicker {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.3; transform: translateX(1px); }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="terminal"></div>
+    <div id="inputLine" onclick="document.getElementById('realInput').focus();">
+      <span id="fakeInput"></span><span id="cursor"></span>
+    </div>
+    <input type="text" id="realInput" autocomplete="off" />
+    <div class="footer-line">This terminal listens.</div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const terminal = document.getElementById("terminal");
+      const fakeInput = document.getElementById("fakeInput");
+      const realInput = document.getElementById("realInput");
+
+      const bootLines = [
+        "BOOTING UP...",
+        "LOADING INTERFACE...",
+        "INITIALIZING CORE..."
+      ];
+
+      const bootContainer = document.createElement("div");
+      bootContainer.id = "boot-sequence";
+      bootContainer.style.fontFamily = "'Courier New', Courier, monospace";
+      bootContainer.style.color = "#00FF99";
+      bootContainer.style.padding = "20px";
+      bootContainer.style.whiteSpace = "pre-wrap";
+
+      document.body.insertBefore(bootContainer, document.body.firstChild);
+
+      let i = 0;
+      const delay = 1000;
+
+      function typeBootLine() {
+        if (i < bootLines.length) {
+          const line = document.createElement("div");
+          line.textContent = bootLines[i];
+          line.classList.add("glitch");
+          bootContainer.appendChild(line);
+          i++;
+          setTimeout(typeBootLine, delay);
+        } else {
+          setTimeout(() => {
+            bootContainer.remove();
+            document.getElementById("container").style.display = "flex";
+            realInput.focus();
+            initTerminal();
+          }, 1500);
+        }
+      }
+
+      function initTerminal() {
+        const genericResponses = {
+          help: "Available Commands:\n- hello\n- who\n- core/info\n- reboot\n\nCustomize these responses in the script.",
+          hello: "Greetings. Terminal is active.",
+          who: "This is a modular terminal shell. Customize me.",
+          reboot: "System reboot simulated. All clear.",
+          default: "Command not recognized. Try again."
+        };
+
+        const idleWhispers = [
+          "System is stable...",
+          "Awaiting next command...",
+          "Silence detected. Remaining on standby.",
+          "Passive scan complete. No anomalies."
+        ];
+
+        setInterval(() => {
+          const whisper = idleWhispers[Math.floor(Math.random() * idleWhispers.length)];
+          printToTerminal("[system-whisper] " + whisper);
+        }, 30000);
+
+        function printToTerminal(text) {
+          const line = document.createElement("div");
+          line.className = "terminal-line";
+          line.textContent = text;
+          terminal.appendChild(line);
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function respond(input) {
+          const cmd = input.toLowerCase().trim();
+          if (genericResponses[cmd]) {
+            printToTerminal("> " + genericResponses[cmd]);
+          } else {
+            printToTerminal("> " + genericResponses.default);
+          }
+        }
+
+        realInput.addEventListener("input", () => {
+          fakeInput.textContent = realInput.value;
+        });
+
+        realInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            const input = realInput.value.trim();
+            if (input !== "") {
+              printToTerminal("> " + input);
+              respond(input);
+              realInput.value = "";
+              fakeInput.textContent = "";
+              terminal.scrollTop = terminal.scrollHeight;
+            }
+          }
+        });
+
+        printToTerminal("█ Soul Terminal — Template Edition Initialized.");
+        printToTerminal("█ Type 'help' for available commands.");
+      }
+
+      typeBootLine();
+    });
+  </script>
+</body>
+</html>
